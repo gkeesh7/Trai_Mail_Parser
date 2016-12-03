@@ -1,9 +1,8 @@
 import urllib2
 import re
-import json
 from bs4 import BeautifulSoup
 
-url_list = ['http://trai.gov.in/Comments/OLD/27-Mar=to-10-Apr/27-mar.html',
+url_list = ['http://trai.gov.in/Comments/OLD/27-Mar=to-10-Apr/27-mar.html' ,
 			'http://trai.gov.in/Comments/11-APRIL/11-April.html',
 			'http://www.trai.gov.in/Comments/12-April/12-April-p2/12-April-p2.html',
 			'http://www.trai.gov.in/Comments/13-April-15/13-April.html',
@@ -20,8 +19,8 @@ url_list = ['http://trai.gov.in/Comments/OLD/27-Mar=to-10-Apr/27-mar.html',
 			'http://trai.gov.in/comments/20-April/20-April.html',
 			'http://www.trai.gov.in/Comments/21-April/21-April.html',
 			'http://www.trai.gov.in/Comments/22-April/22-April.html',
-			'http://trai.gov.in/comments/OLD/23-April/23-April.html',
-			'http://trai.gov.in/comments/24-April/24-April.html'
+			#'http://trai.gov.in/comments/OLD/23-April/23-April.html'
+			'http://trai.gov.in/comments/24-April/24-April.html',
 			]
 
 def replace_dot_and_at_in_email(mail):
@@ -31,6 +30,7 @@ def replace_dot_and_at_in_email(mail):
 
 total_count = 0
 
+text_file = open("emailids1.txt","w")
 for url in url_list:
 	soup = BeautifulSoup(urllib2.urlopen(url).read())
 
@@ -42,20 +42,21 @@ for url in url_list:
 
 
 	name_email_list = []
-
 	print url,total_count
 	for row in content_rows:
 		total_count += 1
 		name_email_combined = row.find_all("td")[1].get_text()
-		#str_name_email_combined = str(name_email_combined)
-		#print  , str(re.findall("<(.*)>",name_email_combined))
-		
 		name  = str(re.findall("(.*)<",name_email_combined))
 		email = str(re.findall("<(.*)>",name_email_combined))
 		email = replace_dot_and_at_in_email(email)
-		name_email_list.append((name,email))
-		with open('mails.json','a') as outfile:
-			json.dump(name_email_list,outfile)
+		email = email.replace("[u'","");
+		email = email.replace("']","");
+		email = email.replace("[]","");
+		if email!="":
+			#print email
+			text_file.write(" %s," %email)
+
+text_file.close()
 
 
 print total_count
